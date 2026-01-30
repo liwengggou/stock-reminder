@@ -141,9 +141,9 @@ const checkAlerts = async () => {
     for (const alert of alerts) {
       const currentPrice = priceMap.get(alert.symbol);
 
-      if (currentPrice === undefined) {
-        // Log that we couldn't check this alert due to missing price
-        console.warn(`Skipping alert ${alert.id} (${alert.symbol}): no price data available`);
+      // Check for undefined, null, NaN, or non-positive prices
+      if (currentPrice === undefined || currentPrice === null || isNaN(currentPrice) || currentPrice <= 0) {
+        console.warn(`Skipping alert ${alert.id} (${alert.symbol}): invalid price data (${currentPrice})`);
         continue;
       }
 
@@ -153,6 +153,19 @@ const checkAlerts = async () => {
 
       if (shouldTrigger) {
         console.log(`Alert triggered: ${alert.symbol} ${alert.alert_type} $${alert.target_price} (current: $${currentPrice})`);
+
+        // Mark alert as triggered FIRST to prevent duplicate processing
+        try {
+          await pool.execute(
+            `UPDATE alerts
+             SET is_triggered = TRUE, triggered_at = NOW(), triggered_price = ?
+             WHERE id = ? AND is_triggered = FALSE`,
+            [currentPrice, alert.id]
+          );
+        } catch (dbError) {
+          console.error(`Failed to mark alert ${alert.id} as triggered:`, dbError.message);
+          continue; // Skip this alert if we can't mark it
+        }
 
         // Log email attempt
         let emailLogId = null;
@@ -167,8 +180,7 @@ const checkAlerts = async () => {
           console.error('Failed to create email log:', logError.message);
         }
 
-        // Send email notification FIRST
-        let emailSent = false;
+        // Send email notification
         try {
           await sendAlertEmail(alert.email, {
             symbol: alert.symbol,
@@ -178,7 +190,8 @@ const checkAlerts = async () => {
             currentPrice: currentPrice,
             triggeredAt: new Date()
           });
-          emailSent = true;
+
+          console.log(`Alert ${alert.id} email sent successfully`);
 
           // Update email log to success
           if (emailLogId) {
@@ -199,23 +212,17 @@ const checkAlerts = async () => {
               [emailError.message, emailLogId]
             );
           }
-        }
 
-        // Only mark alert as triggered if email was sent successfully
-        if (emailSent) {
+          // Revert the triggered status so we can retry
           try {
             await pool.execute(
-              `UPDATE alerts
-               SET is_triggered = TRUE, triggered_at = NOW(), triggered_price = ?
-               WHERE id = ?`,
-              [currentPrice, alert.id]
+              `UPDATE alerts SET is_triggered = FALSE, triggered_at = NULL, triggered_price = NULL WHERE id = ?`,
+              [alert.id]
             );
-            console.log(`Alert ${alert.id} marked as triggered`);
-          } catch (dbError) {
-            console.error(`Failed to mark alert ${alert.id} as triggered:`, dbError.message);
+            console.warn(`Alert ${alert.id} reverted - will retry on next check`);
+          } catch (revertError) {
+            console.error(`Failed to revert alert ${alert.id}:`, revertError.message);
           }
-        } else {
-          console.warn(`Alert ${alert.id} NOT marked as triggered - email failed, will retry next check`);
         }
       }
     }

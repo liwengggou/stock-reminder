@@ -73,9 +73,15 @@ router.post('/', async (req, res) => {
 
     // Validation
     if (!symbol || !alertType || targetPrice === undefined) {
-      return res.status(400).json({ 
-        error: 'Symbol, alertType, and targetPrice are required' 
+      return res.status(400).json({
+        error: 'Symbol, alertType, and targetPrice are required'
       });
+    }
+
+    // Validate symbol format (1-5 letters, optionally with a dot for class shares like BRK.A)
+    const symbolRegex = /^[A-Za-z]{1,5}(\.[A-Za-z])?$/;
+    if (!symbolRegex.test(symbol)) {
+      return res.status(400).json({ error: 'Invalid stock symbol format' });
     }
 
     if (!['below', 'above'].includes(alertType)) {

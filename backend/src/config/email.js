@@ -73,7 +73,8 @@ const sendAlertEmail = async (to, alertData) => {
   }
 };
 
-const sendPasswordResetEmail = async (to, resetToken, frontendUrl = 'http://localhost:5173') => {
+const sendPasswordResetEmail = async (to, resetToken) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const resetLink = `${frontendUrl}/reset-password?token=${resetToken}`;
 
   const mailOptions = {
@@ -114,7 +115,8 @@ const sendPasswordResetEmail = async (to, resetToken, frontendUrl = 'http://loca
   }
 };
 
-const sendVerificationEmail = async (to, verificationToken, frontendUrl = 'http://localhost:5173') => {
+const sendVerificationEmail = async (to, verificationToken) => {
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
   const verifyLink = `${frontendUrl}/verify-email?token=${verificationToken}`;
 
   const mailOptions = {

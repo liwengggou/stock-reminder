@@ -107,9 +107,9 @@ export default function CreateAlert() {
               <div className="text-right">
                 {stockPrice && (
                   <>
-                    <p className="font-bold text-xl">${stockPrice.price?.toFixed(2)}</p>
-                    <p className={`text-sm ${stockPrice.change >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-                      {stockPrice.change >= 0 ? '+' : ''}{stockPrice.changePercent?.toFixed(2)}%
+                    <p className="font-bold text-xl">${stockPrice?.price?.toFixed(2)}</p>
+                    <p className={`text-sm ${(stockPrice?.change ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>
+                      {(stockPrice?.change ?? 0) >= 0 ? '+' : ''}{stockPrice?.changePercent?.toFixed(2)}%
                     </p>
                   </>
                 )}
@@ -219,9 +219,9 @@ export default function CreateAlert() {
                     placeholder="0.00"
                   />
                 </div>
-                {stockPrice && targetPrice && (
+                {stockPrice?.price && targetPrice && (
                   <p className="mt-2 text-sm text-gray-500">
-                    {alertType === 'below' 
+                    {alertType === 'below'
                       ? `Alert when ${selectedStock.symbol} drops ${((1 - parseFloat(targetPrice) / stockPrice.price) * 100).toFixed(1)}% from current price`
                       : `Alert when ${selectedStock.symbol} rises ${((parseFloat(targetPrice) / stockPrice.price - 1) * 100).toFixed(1)}% from current price`
                     }

@@ -9,8 +9,8 @@ import authMiddleware from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Rate limit auth endpoints (higher limit for testing)
-router.use(rateLimit(100, 60000));
+// Rate limit auth endpoints (10 requests per minute)
+router.use(rateLimit(10, 60000));
 
 // Sign up
 router.post('/signup', async (req, res) => {

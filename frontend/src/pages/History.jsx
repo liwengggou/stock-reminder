@@ -1,14 +1,15 @@
 import { useState, useEffect } from 'react';
 import { alertsAPI } from '../api/client';
 import Layout from '../components/Layout';
-import { 
-  Clock, TrendingUp, TrendingDown, RefreshCw, 
-  Bell, CheckCircle 
+import {
+  Clock, TrendingUp, TrendingDown, RefreshCw,
+  Bell, CheckCircle, AlertCircle
 } from 'lucide-react';
 
 export default function History() {
   const [alerts, setAlerts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -17,6 +18,7 @@ export default function History() {
         setAlerts(response.data.alerts);
       } catch (err) {
         console.error('Failed to load history:', err);
+        setError('Failed to load alert history. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -42,6 +44,18 @@ export default function History() {
       <Layout>
         <div className="flex justify-center py-12">
           <RefreshCw className="w-8 h-8 animate-spin text-indigo-600" />
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="text-center py-16 bg-white rounded-xl border">
+          <AlertCircle className="w-12 h-12 text-red-400 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-900 mb-2">Error Loading History</h3>
+          <p className="text-gray-500">{error}</p>
         </div>
       </Layout>
     );

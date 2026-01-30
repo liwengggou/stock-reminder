@@ -66,9 +66,10 @@ export default function Dashboard() {
 
   const handleSaveEdit = async (id) => {
     try {
-      await alertsAPI.update(id, { targetPrice: parseFloat(editPrice) });
-      setAlerts(alerts.map(a => 
-        a.id === id ? { ...a, target_price: editPrice } : a
+      const newPrice = parseFloat(editPrice);
+      await alertsAPI.update(id, { targetPrice: newPrice });
+      setAlerts(alerts.map(a =>
+        a.id === id ? { ...a, target_price: newPrice } : a
       ));
       setEditingId(null);
     } catch {
@@ -242,11 +243,11 @@ export default function Dashboard() {
                     <p className="text-xs text-gray-500 uppercase">Current Price</p>
                     {priceData ? (
                       <div className="flex items-center gap-2">
-                        <p className="text-lg font-semibold">${priceData.price?.toFixed(2)}</p>
+                        <p className="text-lg font-semibold">${priceData?.price?.toFixed(2)}</p>
                         <span className={`text-sm ${
-                          priceData.change >= 0 ? 'text-green-600' : 'text-red-600'
+                          (priceData?.change ?? 0) >= 0 ? 'text-green-600' : 'text-red-600'
                         }`}>
-                          {priceData.change >= 0 ? '+' : ''}{priceData.changePercent?.toFixed(2)}%
+                          {(priceData?.change ?? 0) >= 0 ? '+' : ''}{priceData?.changePercent?.toFixed(2)}%
                         </span>
                       </div>
                     ) : (
@@ -255,11 +256,11 @@ export default function Dashboard() {
                   </div>
                   <div className="hidden md:block">
                     <p className="text-xs text-gray-500 uppercase">Distance</p>
-                    {priceData && (
+                    {priceData?.price && (
                       <p className={`text-lg font-semibold ${
                         status === 'close' ? 'text-yellow-600' : 'text-gray-600'
                       }`}>
-                        {alert.alert_type === 'below' 
+                        {alert.alert_type === 'below'
                           ? `${(((priceData.price - parseFloat(alert.target_price)) / parseFloat(alert.target_price)) * 100).toFixed(1)}%`
                           : `${(((parseFloat(alert.target_price) - priceData.price) / priceData.price) * 100).toFixed(1)}%`
                         }

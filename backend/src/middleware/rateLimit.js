@@ -2,7 +2,9 @@ const rateLimitStore = new Map();
 
 const rateLimit = (maxRequests = 10, windowMs = 60000) => {
   return (req, res, next) => {
-    const key = req.ip;
+    // Use x-forwarded-for for proxied requests (Vercel, etc.), fallback to req.ip
+    const forwarded = req.headers['x-forwarded-for'];
+    const key = forwarded ? forwarded.split(',')[0].trim() : req.ip;
     const now = Date.now();
     
     if (!rateLimitStore.has(key)) {
