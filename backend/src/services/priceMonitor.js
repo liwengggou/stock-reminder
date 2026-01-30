@@ -184,7 +184,7 @@ const checkAlerts = async () => {
           // Update email log to success
           if (emailLogId) {
             await pool.execute(
-              `UPDATE email_logs SET status = 'sent', attempts = 1, last_attempt_at = datetime('now')
+              `UPDATE email_logs SET status = 'sent', attempts = 1, last_attempt_at = NOW()
                WHERE id = ?`,
               [emailLogId]
             );
@@ -195,7 +195,7 @@ const checkAlerts = async () => {
           // Update email log to failed
           if (emailLogId) {
             await pool.execute(
-              `UPDATE email_logs SET status = 'failed', attempts = 3, last_attempt_at = datetime('now'),
+              `UPDATE email_logs SET status = 'failed', attempts = 3, last_attempt_at = NOW(),
                error_message = ? WHERE id = ?`,
               [emailError.message, emailLogId]
             );
@@ -207,7 +207,7 @@ const checkAlerts = async () => {
           try {
             await pool.execute(
               `UPDATE alerts
-               SET is_triggered = TRUE, triggered_at = datetime('now'), triggered_price = ?
+               SET is_triggered = TRUE, triggered_at = NOW(), triggered_price = ?
                WHERE id = ?`,
               [currentPrice, alert.id]
             );

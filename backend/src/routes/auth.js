@@ -46,7 +46,7 @@ router.post('/signup', async (req, res) => {
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const [result] = await pool.execute(
-      'INSERT INTO users (email, password_hash, verification_token, email_verified) VALUES (?, ?, ?, 0)',
+      'INSERT INTO users (email, password_hash, verification_token, email_verified) VALUES (?, ?, ?, FALSE)',
       [email, passwordHash, verificationToken]
     );
 
@@ -241,7 +241,7 @@ router.get('/verify-email/:token', async (req, res) => {
 
     // Mark email as verified
     await pool.execute(
-      'UPDATE users SET email_verified = 1, verification_token = NULL WHERE id = ?',
+      'UPDATE users SET email_verified = TRUE, verification_token = NULL WHERE id = ?',
       [user.id]
     );
 

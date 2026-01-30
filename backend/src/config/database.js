@@ -64,7 +64,7 @@ const initDatabase = async () => {
         id SERIAL PRIMARY KEY,
         email TEXT UNIQUE NOT NULL,
         password_hash TEXT NOT NULL,
-        email_verified INTEGER DEFAULT 0,
+        email_verified BOOLEAN DEFAULT FALSE,
         verification_token TEXT,
         password_reset_token TEXT,
         password_reset_expires TIMESTAMP,
@@ -82,7 +82,7 @@ const initDatabase = async () => {
         stock_name TEXT,
         alert_type TEXT CHECK(alert_type IN ('below', 'above')) NOT NULL,
         target_price REAL NOT NULL,
-        is_triggered INTEGER DEFAULT 0,
+        is_triggered BOOLEAN DEFAULT FALSE,
         triggered_at TIMESTAMP NULL,
         triggered_price REAL NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
