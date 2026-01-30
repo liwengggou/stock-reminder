@@ -1,12 +1,12 @@
 {
-  "name": "stock-tracker-backend",
+  "name": "stock-tracker",
   "version": "1.0.0",
+  "private": true,
   "type": "module",
-  "description": "Stock Price Alert API Server",
-  "main": "src/index.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "nodemon src/index.js"
+    "build": "cd frontend && npm install && npm run build",
+    "dev": "concurrently \"cd backend && npm run dev\" \"cd frontend && npm run dev\"",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -20,6 +20,6 @@
     "yahoo-finance2": "^2.9.0"
   },
   "devDependencies": {
-    "nodemon": "^3.0.2"
+    "concurrently": "^8.2.2"
   }
 }
