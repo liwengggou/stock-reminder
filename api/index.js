@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 
 import { initDatabase } from '../backend/src/config/database.js';
+import { checkAlerts, isMarketOpen } from '../backend/src/services/priceMonitor.js';
 import authRoutes from '../backend/src/routes/auth.js';
 import stockRoutes from '../backend/src/routes/stocks.js';
 import alertRoutes from '../backend/src/routes/alerts.js';
@@ -29,6 +30,34 @@ app.get('/api/health', (req, res) => {
 app.use('/api/auth', authRoutes);
 app.use('/api/stocks', stockRoutes);
 app.use('/api/alerts', alertRoutes);
+
+// Cron endpoint for Vercel scheduled jobs
+app.get('/api/cron', async (req, res) => {
+  try {
+    if (!isMarketOpen()) {
+      return res.status(200).json({
+        success: true,
+        message: 'Market is closed, skipping price check',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    await checkAlerts();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Price check completed',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Cron job error:', error);
+    return res.status(500).json({
+      success: false,
+      error: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
 
 // Error handling
 app.use((err, req, res, next) => {
