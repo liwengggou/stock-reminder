@@ -4,11 +4,7 @@
   "outputDirectory": "frontend/dist",
   "rewrites": [
     {
-      "source": "/api/cron",
-      "destination": "/api/cron.js"
-    },
-    {
-      "source": "/api/(.*)",
+      "source": "/api/(?!cron)(.*)",
       "destination": "/api/index.js"
     }
   ],
