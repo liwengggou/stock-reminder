@@ -1,7 +1,6 @@
 import express from 'express';
 import YahooFinance from 'yahoo-finance2';
 import authMiddleware from '../middleware/auth.js';
-import 'dotenv/config';
 
 const router = express.Router();
 const yahooFinance = new YahooFinance();

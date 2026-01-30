@@ -1,12 +1,15 @@
 import pg from 'pg';
-import 'dotenv/config';
 
 const { Pool } = pg;
+
+// Check if we need SSL (for Neon or other cloud databases)
+const needsSSL = process.env.DATABASE_URL?.includes('neon') ||
+                 process.env.DATABASE_URL?.includes('sslmode=require');
 
 // Create PostgreSQL connection pool
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: process.env.DATABASE_URL?.includes('neon.tech') ? { rejectUnauthorized: false } : false
+  ssl: needsSSL ? { rejectUnauthorized: false } : false
 });
 
 // Convert MySQL-style ? placeholders to PostgreSQL $1, $2, etc.

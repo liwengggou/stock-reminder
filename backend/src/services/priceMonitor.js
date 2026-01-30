@@ -2,7 +2,6 @@ import cron from 'node-cron';
 import yahooFinance from 'yahoo-finance2';
 import { pool } from '../config/database.js';
 import { sendAlertEmail } from '../config/email.js';
-import 'dotenv/config';
 
 // Finnhub API fallback for price monitoring
 const fetchPriceFromFinnhub = async (symbol) => {

@@ -1,5 +1,4 @@
 import nodemailer from 'nodemailer';
-import 'dotenv/config';
 
 const transporter = nodemailer.createTransport({
   host: process.env.SMTP_HOST || 'smtp.qcloudmail.com',
