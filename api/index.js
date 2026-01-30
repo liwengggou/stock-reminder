@@ -20,6 +20,7 @@ app.use(express.json());
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
+    version: 'v2-cron',
     timestamp: new Date().toISOString(),
     hasDbUrl: !!process.env.DATABASE_URL,
     hasJwtSecret: !!process.env.JWT_SECRET
