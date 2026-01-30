@@ -13,13 +13,16 @@ RUN npm run build
 FROM node:18-alpine
 WORKDIR /app
 
-# Install nginx for serving frontend
-RUN apk add --no-cache nginx
+# Install nginx and build tools for native modules (better-sqlite3)
+RUN apk add --no-cache nginx python3 make g++
 
 # Copy backend
 COPY backend/package*.json ./
 RUN npm ci --production
 COPY backend/ ./
+
+# Remove build tools to reduce image size
+RUN apk del python3 make g++
 
 # Copy built frontend
 COPY --from=frontend-build /app/frontend/dist /app/public
