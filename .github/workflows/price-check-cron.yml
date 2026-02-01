@@ -1,0 +1,26 @@
+name: Price Check Cron
+
+on:
+  schedule:
+    # Run every 5 minutes during US market hours (9:30 AM - 4:00 PM ET)
+    # Using 14:00-21:00 UTC to cover both EST and EDT
+    - cron: '*/5 14-21 * * 1-5'
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  trigger-price-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger price check
+        run: |
+          response=$(curl -s -w "\n%{http_code}" https://stock-tracker-beta-khaki.vercel.app/api/cron)
+          http_code=$(echo "$response" | tail -n1)
+          body=$(echo "$response" | head -n -1)
+
+          echo "Response: $body"
+          echo "HTTP Code: $http_code"
+
+          if [ "$http_code" -ne 200 ]; then
+            echo "Error: Cron endpoint returned $http_code"
+            exit 1
+          fi
